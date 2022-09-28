@@ -3,7 +3,6 @@
 показывает диапазон возможных координат точек в этой четверти (x и y).
 '''
 
-
 def coordinatesRange(number):
     if number == 1:
         print(f'в {number} четверти x>0, y>0')
