@@ -9,7 +9,7 @@ b) Подумайте как наделить бота ""интеллектом"
 '''
 
 import random
-candy_num = 160
+candy_num = 2021
 step_max = 28
 
 
