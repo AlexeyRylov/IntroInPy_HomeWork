@@ -7,6 +7,7 @@ number1 = []
 number2 = []
 math_func = 0
 
+
 @bot.message_handler(commands=['help'])
 def help_command(msg: telebot.types.Message):
     bot.send_message(chat_id=msg.from_user.id, text="Справка:\n--------------\
@@ -74,15 +75,22 @@ def send_log(msg: telebot.types.Message):
     log('log', '')
 
 
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
 
 def input_num1(msg: telebot.types.Message):
     global number1
     input_ok = False
-    log('Number 1: ', msg.text)
+    log('Number 1', msg.text)
     while not input_ok:
-        number1 = msg.text.split()
-        if (len(number1) == 1 and number1[0].isdigit()) or\
-            (len(number1) == 2 and number1[0].isdigit() and number1[1].isdigit()):
+        number1 = msg.text.split(' ')
+        if (len(number1) == 1 and isfloat(number1[0]) or\
+           (len(number1) == 2 and isfloat(number1[0]) and isfloat(number1[1]))):
             input_ok = True
             bot.send_message(chat_id=msg.from_user.id, text="\nВвод числа 2: ")
             bot.register_next_step_handler(msg, input_num2)
@@ -95,13 +103,12 @@ def input_num1(msg: telebot.types.Message):
 def input_num2(msg: telebot.types.Message):
     global number2
     input_ok = False
-    log('Number 2: ', msg.text)
+    log('Number 2', msg.text)
     while not input_ok:
         number2 = msg.text.split()
-        if (len(number2) == 1 and number2[0].isdigit()) or\
-            (len(number2) == 2 and number2[0].isdigit() and number2[1].isdigit()):
+        if (len(number2) == 1 and isfloat(number2[0]) or\
+           (len(number2) == 2 and isfloat(number2[0]) and isfloat(number2[1]))):
             input_ok = True
-            # calculation(number1, number2, msg)
             calculation(msg)
         else:
             msg = bot.reply_to(msg, 'Некорректный ввод, попробуйте еще раз:')
@@ -113,8 +120,8 @@ def calculation(msg: telebot.types.Message):
     global number1
     global number2
     global math_func
-    number1 = [int(x) for x in number1]
-    number2 = [int(x) for x in number2]
+    number1 = [float(x) for x in number1]
+    number2 = [float(x) for x in number2]
     result = []
     if len(number1) == 1 and len(number2) == 1:
         if math_func == 1:
@@ -171,15 +178,17 @@ def calculation(msg: telebot.types.Message):
     else:
         return -1
     if len(result) == 1:
-        msg = bot.send_message(chat_id=msg.from_user.id, text=f'Результат расчета: {result}\
+        msg = bot.send_message(chat_id=msg.from_user.id, text=f'Результат расчета: {result[0]}\
                                                               \nОжидание команды. Список тут: /help')
+        log('Result', f'{result[0]}')
     elif len(result) == 2:
         msg = bot.send_message(chat_id=msg.from_user.id, text=f'Результат расчета: {result[0]} + {result[1]}i\
                                                               \nОжидание команды. Список тут: /help')
-    log('Result:', f'{result[0]} + {result[1]}i')
+        log('Result', f'{result[0]} + {result[1]}i')
+
 
 def log(func, val):
-    time = dt.now().strftime('%H:%M')
+    time = dt.now().strftime('%d.%m.%Y %H:%M')
     with open('log.csv', 'a') as file:
         file.write('{};{};{}\n'
                     .format(time, func, val))
